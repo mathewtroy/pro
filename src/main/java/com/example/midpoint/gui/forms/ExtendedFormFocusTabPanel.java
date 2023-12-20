@@ -78,27 +78,53 @@ public class ExtendedFormFocusTabPanel<F extends FocusType>
         addPrismPropertyPanel(body, ID_PROP_SSN, DOMUtil.XSD_STRING,
                 ItemPath.create(ObjectType.F_EXTENSION, ExampleSchemaConstants.SCHEMA_EXTENSION_SSN));
 
-        // TODO: create proxy for these operations
+        // create proxy for these operations
+
+        List<PrismObject<RoleType>> availableSimpleRoles = searchRolesProxy();
+
+
+//        Task task = getPageBase().createSimpleTask(OPERATION_SEARCH_ROLES);
+//
+//        List<PrismObject<RoleType>> availableSimpleRoles;
+
+//        try {
+//            ObjectQuery simpleRoleQuery = getPageBase().getPrismContext()
+//                    .queryFor(RoleType.class)
+//                    .item(RoleType.F_SUBTYPE).eq(ExampleSchemaConstants.ROLE_TYPE_SIMPLE)
+//                    .build();
+//
+//            availableSimpleRoles = getPageBase().getModelService()
+//                    .searchObjects(RoleType.class, simpleRoleQuery, null, task, task.getResult());
+//        } catch (Throwable e) {
+//            task.getResult().recordFatalError(e);
+//            LoggingUtils.logException(LOGGER, "Couldn't load roles", e);
+//            availableSimpleRoles = new ArrayList<>();
+//            // better error reporting
+//            getSession().error("There was an error loading roles: " + e.getMessage());
+//        }
+
+        PrismContainerWrapperModel<F, AssignmentType> assignmentsModel =
+                PrismContainerWrapperModel.fromContainerWrapper(getObjectWrapperModel(), FocusType.F_ASSIGNMENT);
+
+        add(new SimpleRoleSelector<>(ID_ROLES_SIMPLE, assignmentsModel, availableSimpleRoles));
+    }
+
+    private List<PrismObject<RoleType>> searchRolesProxy() {
         Task task = getPageBase().createSimpleTask(OPERATION_SEARCH_ROLES);
-        List<PrismObject<RoleType>> availableSimpleRoles;
         try {
             ObjectQuery simpleRoleQuery = getPageBase().getPrismContext()
                     .queryFor(RoleType.class)
                     .item(RoleType.F_SUBTYPE).eq(ExampleSchemaConstants.ROLE_TYPE_SIMPLE)
                     .build();
 
-            availableSimpleRoles = getPageBase().getModelService()
+            return getPageBase().getModelService()
                     .searchObjects(RoleType.class, simpleRoleQuery, null, task, task.getResult());
         } catch (Throwable e) {
             task.getResult().recordFatalError(e);
             LoggingUtils.logException(LOGGER, "Couldn't load roles", e);
-            availableSimpleRoles = new ArrayList<>();
-            // TODO: better error reporting
+            // better error reporting
+            getSession().error("There was an error loading roles: " + e.getMessage());
+            return new ArrayList<>();
         }
-
-        PrismContainerWrapperModel<F, AssignmentType> assignmentsModel =
-                PrismContainerWrapperModel.fromContainerWrapper(getObjectWrapperModel(), FocusType.F_ASSIGNMENT);
-
-        add(new SimpleRoleSelector<>(ID_ROLES_SIMPLE, assignmentsModel, availableSimpleRoles));
     }
 }

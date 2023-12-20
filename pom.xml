@@ -41,6 +41,10 @@
         <!-- No tests here, but midPoint parent would try to run some, we need to disable it. -->
         <maven.test.skip>true</maven.test.skip>
         <midpoint.version>4.9-SNAPSHOT</midpoint.version>
+
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+
     </properties>
 
     <dependencies>
